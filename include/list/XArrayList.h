@@ -285,7 +285,7 @@ void XArrayList<T>::add(int index, T e)
         add(e);
         return;
     }
-    for (int i=count;i>index;i++) {
+    for (int i=count;i>index;i--) {
         data[i] = data[i-1];
     }
     data[index] = e;

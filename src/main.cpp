@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 {
     // cout << "Assignment-1" << endl;
     if (argc == 1) {
-        tc_inventory1002();
+        tc_inventory1005();
     }
     
     return 0;

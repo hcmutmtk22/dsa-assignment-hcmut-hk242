@@ -33,9 +33,10 @@ public:
 
     //added by me
     bool operator==(List1D<T> &other);
-    List1D<T> operator=(List1D<T> &other);
+    // List1D<T> operator=(List1D<T> &other);
     List1D<T> operator= (const List1D<T> &other);
     void removeAt(int index);
+    void add(int index, const T &value) {plist->add(index, value);}
 
     friend ostream &operator<<(ostream &os, const List1D<T> &list){
         // TODO
@@ -68,7 +69,7 @@ public:
 
     //added
     void addRow(const List1D<T> &list);
-    List2D<T> operator= (List2D<T> &other);
+    // List2D<T> operator= (List2D<T> &other);
     List2D<T> operator= (const List2D<T> &other);
     void removeRowAt(int index);
 
@@ -79,11 +80,11 @@ public:
         return os;
     }
 
-    Iterator begin() {
+    Iterator begin() const {
         return Iterator(this, true);
     }
 
-    Iterator end() {
+    Iterator end() const {
         return Iterator(this, false);
     }
 
@@ -99,15 +100,6 @@ public:
             dlist = NULL;
         }
 
-        Iterator(List2D<T>* dlist, bool begin = true) {
-            this->dlist = dlist;
-            if (begin) {
-                it = dlist->pMatrix->begin();
-            } else {
-                it = dlist->pMatrix->end();
-            }
-        }
-
         Iterator(const List2D<T>* dlist, bool begin = true) {
             this->dlist = new List2D<T>(*dlist);
             if (begin) {
@@ -117,9 +109,10 @@ public:
             }
         }
 
-        Iterator &operator=(Iterator other) {
+        Iterator &operator=(const Iterator& other) {
             this->dlist = other.dlist;
             this->it = other.it;
+            return (*this);
         }
 
         List1D<T> operator*() {
@@ -173,7 +166,7 @@ struct InventoryAttribute
     InventoryAttribute(const string &name, double value) : name(name), value(value) {}
     string toString() const { return name + ": " + to_string(value); }
 
-    InventoryAttribute &operator=(InventoryAttribute &other) {
+    InventoryAttribute &operator=(const InventoryAttribute &other) {
         this->name = other.name;
         this->value = other.value;
         return *this;
@@ -325,11 +318,11 @@ bool List1D<T>::operator==(List1D<T> &other) {
     return true;
 }
 
-template <typename T>
-List1D<T> List1D<T>::operator=(List1D<T> &other) {
-    this->plist = new XArrayList<T>(*(other.plist));
-    return (*this);
-}
+// template <typename T>
+// List1D<T> List1D<T>::operator=(List1D<T> &other) {
+//     this->plist = new XArrayList<T>(*(other.plist));
+//     return (*this);
+// }
 
 template <typename T>
 List1D<T> List1D<T>::operator= (const List1D<T> &other) {
@@ -433,11 +426,11 @@ void List2D<T>::addRow(const List1D<T> &list) {
     pMatrix->add(list);
 }
 
-template <typename T>
-List2D<T> List2D<T>::operator= (List2D<T> &other) {
-    this->pMatrix = new DLinkedList<List1D<T>>(*(other.pMatrix));
-    return (*this);
-}
+// template <typename T>
+// List2D<T> List2D<T>::operator= (List2D<T> &other) {
+//     this->pMatrix = new DLinkedList<List1D<T>>(*(other.pMatrix));
+//     return (*this);
+// }
 
 template <typename T>
 List2D<T> List2D<T>::operator= (const List2D<T> &other) {
@@ -538,12 +531,86 @@ List1D<string> InventoryManager::query(string attributeName, const double &minVa
                                        const double &maxValue, int minQuantity, bool ascending) const
 {
     // TODO
-    List2D<InventoryAttribute>::Iterator it(&attributesMatrix);
+    const List2D<InventoryAttribute>* p = &attributesMatrix;
+    List2D<InventoryAttribute>::Iterator it(p);
+    List1D<string> result;
+    List1D<double> value;
+    List1D<int> qtt;
+
+    int i=0;
+    for (it; it!=p->end(); it++) {
+        List1D<InventoryAttribute> row = *it;
+        for (int j=0; j<row.size(); j++) {
+            InventoryAttribute attribute = row.get(j);
+            if (attribute.name == attributeName && attribute.value >= minValue 
+                && attribute.value <= maxValue && quantities.get(i) >= minQuantity) {
+                if (ascending) {
+                    // SORT ASCENDING
+                    if (value.size()>0) {
+                        int k=0;
+                        while ( k<value.size() && value.get(k)<attribute.value) {
+                            k++;
+                        }
+                        if (k<value.size() && value.get(k)==attribute.value && qtt.get(k)<=quantities.get(i)) {
+                            // compare 2 quantities
+                            result.add(k+1, productNames.get(i));
+                            value.add(k+1, attribute.value);
+                            qtt.add(k+1, quantities.get(i));
+                        } else {
+                            result.add(k, productNames.get(i));
+                            value.add(k, attribute.value);
+                            qtt.add(k, quantities.get(i));
+                        }
+                    } else {
+                        result.add(productNames.get(i));
+                        value.add(attribute.value);
+                        qtt.add(quantities.get(i));
+                        break;
+                    }
+                }
+                else {
+                    // result.add(productNames.get(i));
+                    // break;
+
+                    //SORT DESCENDING
+                    if (value.size()>0) {
+                        int k=0;
+                        while (k<value.size() && value.get(k)>attribute.value) {
+                            k++;
+                        }
+                        if (k<value.size() && value.get(k)==attribute.value && qtt.get(k)>quantities.get(i)) {
+                            // compare 2 quantities
+                            result.add(k+1, productNames.get(i));
+                            value.add(k+1, attribute.value);
+                            qtt.add(k+1, quantities.get(i));
+                        } else {
+                            result.add(k, productNames.get(i));
+                            value.add(k, attribute.value);
+                            qtt.add(k, quantities.get(i));
+                        }
+                    } else {
+                        result.add(productNames.get(i));
+                        value.add(attribute.value);
+                        qtt.add(quantities.get(i));
+                        break;
+                    }
+                }
+            }
+        }
+        i++;
+    }
+    return result;
 }
 
 void InventoryManager::removeDuplicates()
 {
     // TODO
+    // List2D<InventoryAttribute>::Iterator it(&attributesMatrix);
+
+    // for (it; it!=(&attributesMatrix)->end();it++) {
+    //     List1D<InventoryAttribute> row = *it;
+        
+    // }
 }
 
 InventoryManager InventoryManager::merge(const InventoryManager &inv1,
@@ -577,6 +644,13 @@ List1D<int> InventoryManager::getQuantities() const
 string InventoryManager::toString() const
 {
     // TODO
+    stringstream ss;
+    ss << "InventoryManager[" << endl
+        << "\t AttributesMatrix: " << attributesMatrix.toString() << "," << endl
+        << "\t ProductNames: " << productNames.toString() << "," << endl
+        << "\t Quantities: " << quantities.toString() << endl
+        << "]";
+    return ss.str();
 }
 
 #endif /* INVENTORY_MANAGER_H */
