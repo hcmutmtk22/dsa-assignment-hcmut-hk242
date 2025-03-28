@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 {
     // cout << "Assignment-1" << endl;
     if (argc == 1) {
-        dlistDemo6();
+        tc_inventory1006();
     } else {
         for (int i=1;i<argc; i++) {
             cout << endl << "====== TESTCASE " << argv[i] << ": =======" << endl;

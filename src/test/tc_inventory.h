@@ -20,11 +20,13 @@ void tc_inventory1002() {
     
     List2D<int> matrix(arr2D, 3);
     
-    // cout << matrix.toString() << endl;
+    cout << matrix.toString() << endl;
 
     List2D<int>* maddr = &matrix;
 
     //test
+    List2D<int>::Iterator it=matrix.begin();
+    
     for (List2D<int>::Iterator it=matrix.begin(); it!=matrix.end(); it++) {
         cout << *it << " ";
     }
@@ -149,7 +151,7 @@ void tc_inventory1005(){
 
     InventoryManager inventory(attributesMatrix, productNames, quantities);
 
-    List1D<string> queryResult = inventory.query("weight", 10, 20, 30, false);// query weight = [10, 20] and quantities>=30
+    List1D<string> queryResult = inventory.query("weight", 10, 20, 30, true);// query weight = [10, 20] and quantities>=30
     cout << "\nQuery result (weight between 10 and 20, quantity >= 30):" << endl;
     cout << queryResult << endl;
 }
@@ -226,7 +228,7 @@ void tc_inventory1007() {
     InventoryManager inv = InventoryManager::merge(inventory, inventory2);
     cout << inv.toString() << endl;
     InventoryManager section1, section2;
-    inv.split(section1, section2, 0.5);
+    inv.split(section1, section2, 0.8);
     cout << section1.toString() << endl;
     cout << section2.toString() << endl;
 }

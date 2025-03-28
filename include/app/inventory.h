@@ -15,6 +15,9 @@ using namespace std;
 template <typename T>
 class List1D
 {
+public:
+    class Iterator;
+
 private:
     DLinkedList<T>* plist;
 
@@ -43,6 +46,60 @@ public:
         os << list.toString();
         return os;
     }
+
+    Iterator begin() const {
+        return Iterator(this, true);
+    }
+
+    Iterator end() const {
+        return Iterator(this, false);
+    }
+
+    class Iterator {
+    private:
+        List1D<T>* dlist;
+        typename DLinkedList<T>::Iterator it;
+
+    public:
+        Iterator() {
+            dlist = NULL;
+        }
+
+        Iterator(const List1D<T>* dlist, bool begin = true) {
+            this->dlist = new List1D<T>(*dlist);
+            if (begin) {
+                it = dlist->plist->begin();
+            } else {
+                it = dlist->plist->end();
+            }
+        }
+
+        Iterator &operator=(const Iterator& other) {
+            this->dlist = other.dlist;
+            this->it = other.it;
+            return (*this);
+        }
+
+        T operator*() {
+            return *it;
+        }
+        
+        bool operator!=(const Iterator& other) {
+            return this->it != other.it;
+        }
+
+        Iterator &operator++() {
+            ++it;
+            return (*this);
+        }
+
+        Iterator operator++(int) {
+            Iterator e = (*this);
+            ++it;
+            return e;
+        }
+    
+    };
 };
 
 // -------------------- List2D --------------------
@@ -53,7 +110,7 @@ public:
     class Iterator;
 
 private:
-    DLinkedList<List1D<T>> *pMatrix;
+    XArrayList<List1D<T>> *pMatrix;
 
 public:
     List2D();
@@ -93,11 +150,12 @@ public:
     class Iterator {
     private:
         List2D<T>* dlist;
-        typename DLinkedList<List1D<T>>::Iterator it;
+        typename XArrayList<List1D<T>>::Iterator it;
 
     public:
         Iterator() {
             dlist = NULL;
+            
         }
 
         Iterator(const List2D<T>* dlist, bool begin = true) {
@@ -123,6 +181,10 @@ public:
             return this->it != other.it;
         }
 
+        void remove(void (*removeItemData)(T) = 0) {
+            it.remove();
+        }
+
         Iterator &operator++() {
             ++it;
             return (*this);
@@ -143,11 +205,19 @@ string list1DToString(List1D<T>& list) {
     stringstream ss;
     int size = list.size();
     ss << "[";
-    for (int i=0;i<size;i++) {
-        ss << list.get(i);
+    // for (int i=0;i<size;i++) {
+    //     ss << list.get(i);
+    //     if (i<size-1) {
+    //         ss << ", ";
+    //     }
+    // }
+    int i=0;
+    for (typename List1D<T>::Iterator it=list.begin(); it!=list.end(); it++) {
+        ss << *it;
         if (i<size-1) {
             ss << ", ";
         }
+        i++;
     }
     ss << "]";
     return ss.str();
@@ -262,7 +332,7 @@ template <typename T>
 List1D<T>::List1D(const List1D<T> &other)
 {
     // TODO
-    this->plist = new XArrayList<T>(*(other.plist));
+    this->plist = new DLinkedList<T>(*(other.plist));
 }
 
 template <typename T>
@@ -290,8 +360,7 @@ template <typename T>
 void List1D<T>::set(int index, T value)
 {
     // TODO
-    typename XArrayList<T>::Iterator it(plist, index);
-    *it = value;
+    plist->set(index, value);
 }
 
 template <typename T>
@@ -326,7 +395,7 @@ bool List1D<T>::operator==(const List1D<T> &other) {
 
 template <typename T>
 List1D<T> List1D<T>::operator= (const List1D<T> &other) {
-    plist = new XArrayList(*(other.plist));
+    plist = new DLinkedList<T>(*(other.plist));
     return (*this);
 }
 
@@ -348,14 +417,14 @@ template <typename T>
 List2D<T>::List2D()
 {
     // TODO
-    pMatrix = new DLinkedList<List1D<T>>();
+    pMatrix = new XArrayList<List1D<T>>();
 }
 
 template <typename T>
 List2D<T>::List2D(List1D<T> *array, int num_rows)
 {
     // TODO
-    pMatrix = new DLinkedList<List1D<T>>();
+    pMatrix = new XArrayList<List1D<T>>();
     for (int i=0;i<num_rows;i++) {
         List1D<T> newlist = array[i];
         pMatrix->add(newlist);
@@ -366,7 +435,7 @@ template <typename T>
 List2D<T>::List2D(const List2D<T> &other)
 {
     // TODO
-    pMatrix = new DLinkedList<List1D<T>>(*(other.pMatrix));
+    pMatrix = new XArrayList<List1D<T>>(*(other.pMatrix));
 }
 
 template <typename T>
@@ -434,7 +503,7 @@ void List2D<T>::addRow(const List1D<T> &list) {
 
 template <typename T>
 List2D<T> List2D<T>::operator= (const List2D<T> &other) {
-    this->pMatrix = new DLinkedList<List1D<T>>(*(other.pMatrix));
+    this->pMatrix = new XArrayList<List1D<T>>(*(other.pMatrix));
     return (*this);
 }
 
@@ -612,11 +681,12 @@ void InventoryManager::removeDuplicates()
         List2D<InventoryAttribute>::Iterator jt = it;
         jt++;
         int j=i+1;
-        for (jt; jt!=(&attributesMatrix)->end(); jt++) {
+        for (jt; jt!=(&attributesMatrix)->end(); ++jt) {
             if (*it == *jt) {
                 int quantity = quantities.get(j);
                 quantities.set(i, quantities.get(i)+ quantity);
-                attributesMatrix.removeRowAt(j);
+                // attributesMatrix.removeRowAt(j);
+                jt.remove();
                 productNames.removeAt(j);
                 quantities.removeAt(j);
             }
