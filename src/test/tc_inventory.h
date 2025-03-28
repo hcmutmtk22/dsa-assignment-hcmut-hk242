@@ -20,7 +20,7 @@ void tc_inventory1002() {
     
     List2D<int> matrix(arr2D, 3);
     
-    cout << matrix.toString() << endl;
+    // cout << matrix.toString() << endl;
 
     List2D<int>* maddr = &matrix;
 
@@ -126,7 +126,7 @@ void tc_inventory1005(){
     int numAttrA = sizeof(arrA) / sizeof(arrA[0]);
     List1D<InventoryAttribute> listAttrA(arrA, numAttrA);
 
-    InventoryAttribute attrB1("weight", 20);
+    InventoryAttribute attrB1("weight", 15);
     InventoryAttribute attrB2("depth", 24);
     InventoryAttribute attrB3("height", 100);
     InventoryAttribute arrB[] = { attrB1, attrB2, attrB3 };
@@ -226,7 +226,7 @@ void tc_inventory1007() {
     InventoryManager inv = InventoryManager::merge(inventory, inventory2);
     cout << inv.toString() << endl;
     InventoryManager section1, section2;
-    inv.split(section1, section2, 0.3);
+    inv.split(section1, section2, 0.5);
     cout << section1.toString() << endl;
     cout << section2.toString() << endl;
 }

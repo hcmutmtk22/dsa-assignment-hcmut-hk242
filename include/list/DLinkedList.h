@@ -371,28 +371,15 @@ DLinkedList<T>::~DLinkedList()
         p = p->next;
         delete temp;
     }
+    deleteUserData = 0;
+    itemEqual = 0;
 }
 
 template <class T>
 void DLinkedList<T>::add(T e)
 {
     // TODO
-    // if (count==0) {
-    //     head->data = e;
-    //     count++;
-    //     return;
-    //     // Node* n = new Node(e);
-    //     // n->next = tail;
-    //     // n->prev = head;
-    //     // head->next = n;
-    //     // tail->prev = n;
-    //     // count++;
-    //     // return;
-    // }
     Node* p = new Node(e);
-    // tail->next = p;
-    // p->prev = tail;
-    // tail = tail->next;
     p->prev = tail->prev;
     p->next = tail;
     tail->prev->next = p;
@@ -409,20 +396,14 @@ void DLinkedList<T>::add(int index, T e)
         return;
     }
     Node* p = new Node(e);
-    if (index==0) {
-        p->next = head;
-        head->prev = p;
-        head = p;
-    } else {
-        Node* curr = head;
-        for (int i=0;i<index;i++) {
-            curr = curr->next;
-        }
-        p->next = curr;
-        p->prev = curr->prev;
-        curr->prev->next = p;
-        curr->prev = p;
+    Node* curr = head->next;
+    for (int i=0;i<index;i++) {
+        curr = curr->next;
     }
+    p->next = curr;
+    p->prev = curr->prev;
+    curr->prev->next = p;
+    curr->prev = p;
     count++;
 }
 
@@ -464,27 +445,17 @@ T DLinkedList<T>::removeAt(int index)
         throw std::out_of_range("The index is not valid");
     }
     count--;
-    // if (index==0) {
-    //     T result = head->next->data;
-    //     Node* p = head;
-    //     if (head->next) {
-    //         head = head->next;
-    //         head->prev = NULL;
-    //     }
-    //     delete p;
-    //     return result;
-    // }
-    // if (index==count-1) {
-    //     T result = tail->data;
-    //     Node* p = tail;
-    //     tail = tail->prev;
-    //     tail->next = NULL;
-    //     delete p;
-    //     return result;
-    // }
-    Node* p = head->next;
-    for (int i=0;i<index;i++) {
-        p = p->next;
+    Node* p;
+    if (index < count/2) {
+        p = head->next;
+        for (int i=0;i<index;i++) {
+            p = p->next;
+        }
+    } else {
+        p = tail->prev;
+        for (int i=count;i>index;i--) {
+            p = p->prev;
+        }
     }
     T result = p->data;
     p->prev->next = p->next;
