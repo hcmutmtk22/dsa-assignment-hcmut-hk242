@@ -32,7 +32,7 @@ public:
     string toString() const;
 
     //added by me
-    bool operator==(List1D<T> &other);
+    bool operator==(const List1D<T> &other);
     // List1D<T> operator=(List1D<T> &other);
     List1D<T> operator= (const List1D<T> &other);
     void removeAt(int index);
@@ -182,12 +182,12 @@ struct InventoryAttribute
 
     string toString() {
         stringstream ss;
-        ss << "[" << this->name << ", " << this->value << "]";
+        ss << this->name << ", " << fixed << setprecision(6) << this->value;
         return ss.str();
     }
 
     friend ostream &operator<< (ostream& os, InventoryAttribute attribute) {
-        os << "[" << attribute.name << ", " << attribute.value << "]";
+        os << attribute.name << ": " << fixed << setprecision(6) << attribute.value;
         return os;
     }
 };
@@ -309,7 +309,7 @@ string List1D<T>::toString() const
 }
 
 template <typename T>
-bool List1D<T>::operator==(List1D<T> &other) {
+bool List1D<T>::operator==(const List1D<T> &other) {
     for (int i=0;i<size();i++) {
         if (get(i)!=other.get(i)) {
             return false;
@@ -605,18 +605,39 @@ List1D<string> InventoryManager::query(string attributeName, const double &minVa
 void InventoryManager::removeDuplicates()
 {
     // TODO
-    // List2D<InventoryAttribute>::Iterator it(&attributesMatrix);
-
-    // for (it; it!=(&attributesMatrix)->end();it++) {
-    //     List1D<InventoryAttribute> row = *it;
-        
-    // }
+    List2D<InventoryAttribute>::Iterator it(&attributesMatrix);
+    int i=0;
+    for (it; it!=(&attributesMatrix)->end();it++) {
+        List1D<InventoryAttribute> row = *it;
+        List2D<InventoryAttribute>::Iterator jt = it;
+        jt++;
+        int j=i+1;
+        for (jt; jt!=(&attributesMatrix)->end(); jt++) {
+            if (*it == *jt) {
+                int quantity = quantities.get(j);
+                quantities.set(i, quantities.get(i)+ quantity);
+                attributesMatrix.removeRowAt(j);
+                productNames.removeAt(j);
+                quantities.removeAt(j);
+            }
+            j++;
+        }
+        i++;
+    }
 }
 
 InventoryManager InventoryManager::merge(const InventoryManager &inv1,
                                          const InventoryManager &inv2)
 {
     // TODO
+    InventoryManager inv(inv1);
+    List2D<InventoryAttribute>::Iterator it(&inv2.attributesMatrix);
+    int i=0;
+    for (it; it!=(&inv2.attributesMatrix)->end(); it++) {
+        inv.addProduct(*it, inv2.productNames.get(i), inv2.quantities.get(i));
+        i++;
+    }
+    return inv;
 }
 
 void InventoryManager::split(InventoryManager &section1,
@@ -624,21 +645,34 @@ void InventoryManager::split(InventoryManager &section1,
                              double ratio) const
 {
     // TODO
+    int i=0;
+    double n = ceil(ratio * productNames.size());
+    int num_first = (int) n;
+    List2D<InventoryAttribute>::Iterator it(&attributesMatrix, true);
+    for (it; i<num_first;it++, i++) { // adding sublist
+        section1.addProduct(*it, productNames.get(i), quantities.get(i));
+    }
+    for (it; i<productNames.size(); it++, i++) {
+        section2.addProduct(*it, productNames.get(i), quantities.get(i));
+    }
 }
 
 List2D<InventoryAttribute> InventoryManager::getAttributesMatrix() const
 {
     // TODO
+    return this->attributesMatrix;
 }
 
 List1D<string> InventoryManager::getProductNames() const
 {
     // TODO
+    return this->productNames;
 }
 
 List1D<int> InventoryManager::getQuantities() const
 {
     // TODO
+    return this->quantities;
 }
 
 string InventoryManager::toString() const
@@ -646,9 +680,9 @@ string InventoryManager::toString() const
     // TODO
     stringstream ss;
     ss << "InventoryManager[" << endl
-        << "\t AttributesMatrix: " << attributesMatrix.toString() << "," << endl
-        << "\t ProductNames: " << productNames.toString() << "," << endl
-        << "\t Quantities: " << quantities.toString() << endl
+        << "  AttributesMatrix: " << attributesMatrix.toString() << "," << endl
+        << "  ProductNames: " << productNames.toString() << "," << endl
+        << "  Quantities: " << quantities.toString() << endl
         << "]";
     return ss.str();
 }

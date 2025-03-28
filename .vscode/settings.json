@@ -19,6 +19,7 @@
         "tuple": "cpp",
         "utility": "cpp",
         "xlocinfo": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "iomanip": "cpp"
     }
 }
