@@ -16,7 +16,7 @@ template <typename T>
 class List1D
 {
 private:
-    XArrayList<T>* plist;
+    DLinkedList<T>* plist;
 
 public:
     List1D();
@@ -238,21 +238,21 @@ template <typename T>
 List1D<T>::List1D()
 {
     // TODO
-    plist = new XArrayList<T>();
+    plist = new DLinkedList<T>();
 }
 
 template <typename T>
 List1D<T>::List1D(int num_elements)
 {
     // TODO
-    plist = new XArrayList<T>(0, 0, num_elements);
+    plist = new DLinkedList<T>(0, 0, num_elements);
 }
 
 template <typename T>
 List1D<T>::List1D(const T *array, int num_elements)
 {
     // TODO
-    plist = new XArrayList<T>();
+    plist = new DLinkedList<T>();
     for (int i=0;i<num_elements; i++) {
         plist->add(array[i]);
     }
