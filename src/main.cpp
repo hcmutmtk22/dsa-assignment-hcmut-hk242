@@ -35,7 +35,12 @@ int main(int argc, char **argv)
 {
     // cout << "Assignment-1" << endl;
     if (argc == 1) {
-        tc_inventory1007();
+        xlistDemo1();
+    } else {
+        for (int i=1;i<argc; i++) {
+            cout << endl << "====== TESTCASE " << i << ": =======" << endl;
+            run(atoi(argv[i]));
+        }
     }
     
     return 0;

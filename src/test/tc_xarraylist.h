@@ -6,16 +6,17 @@ using namespace std;
 
 void xlistDemo1(){
     XArrayList<int> iList;
-    for(int i = 0; i< 10 ; i++)
-        iList.add(i, i*i);
-    
-    //iList.dump();
+    for(int i = 0; i < 10 ; i++)
+        iList.add(i);
+    // iList.dump();
     for(XArrayList<int>::Iterator it=iList.begin(); it != iList.end(); it++ )
         cout << *it << ", found at: " << iList.indexOf(*it) << endl;
     cout << endl;
-    int item = 120;
+    int item = 2;
     int foundIdx = iList.indexOf(item);
-    cout    << "lookup for " << item  << " found at: " << foundIdx << endl;
+    cout << "lookup for " << item  << " found at: " << foundIdx << endl;
+    iList.get(10) = 999;
+    iList.println();
 }
 
 void xlistDemo2(){
@@ -23,6 +24,8 @@ void xlistDemo2(){
     alist.add(Point(23.2f, 25.4f));
     alist.add(Point(24.6f, 23.1f));  
     alist.println();
+    XArrayList<Point> il2 = alist;
+    cout << il2.toString();
 }
 
 void xlistDemo3(){

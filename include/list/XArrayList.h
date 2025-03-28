@@ -270,7 +270,7 @@ template <class T>
 void XArrayList<T>::add(T e)
 {
     // TODO
-    ensureCapacity(count);
+    ensureCapacity(count+1);
     data[count] = e;
     count++;
 }
@@ -336,9 +336,11 @@ template <class T>
 void XArrayList<T>::clear()
 {
     // TODO
-    delete data;
-    count = 0;
-    data = new T[10];
+    if (data) {
+        delete data;
+        count = 0;
+        data = new T[10];
+    }
 }
 
 template <class T>
@@ -358,7 +360,6 @@ int XArrayList<T>::indexOf(T item)
             return i;
         }
     }
-    
     return -1;
 }
 template <class T>
@@ -423,12 +424,19 @@ void XArrayList<T>::ensureCapacity(int index)
         std::out_of_range("The index is out of range");
     }
     if (index>=capacity) {
-        int new_cap = capacity*1.5;
-        T* newdata = new T[new_cap];
+        capacity = (int) capacity*1.5;
+        T* newdata /*new T[new_cap]*/;
+        try {
+            newdata = new T[capacity];
+            if (!newdata) throw std::bad_alloc();
+        }
+        catch (...) {
+            cout << "Bad allocation!!!" << endl;
+        }
         for (int i=0;i<count;i++) {
             newdata[i] = data[i];
         }
-        delete data;
+        delete[] data;
         data = newdata;
     }
 }
