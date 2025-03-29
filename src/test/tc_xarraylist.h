@@ -15,8 +15,6 @@ void xlistDemo1(){
     int item = 2;
     int foundIdx = iList.indexOf(item);
     cout << "lookup for " << item  << " found at: " << foundIdx << endl;
-    iList.get(10) = 999;
-    iList.println();
 }
 
 void xlistDemo2(){

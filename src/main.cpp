@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void (*func_ptr[15])() = {
+void (*func_ptr[17])() = {
     dlistDemo1,
     dlistDemo2,
     dlistDemo3,
@@ -23,7 +23,9 @@ void (*func_ptr[15])() = {
     tc_inventory1002,
     tc_inventory1003,
     tc_inventory1004,
-    tc_inventory1005
+    tc_inventory1005,
+    tc_inventory1006,
+    tc_inventory1007
 };
 
 void run(int func_idx)
@@ -35,10 +37,10 @@ int main(int argc, char **argv)
 {
     // cout << "Assignment-1" << endl;
     if (argc == 1) {
-        xlistDemo1();
+        tc_inventory1006();
     } else {
         for (int i=1;i<argc; i++) {
-            cout << endl << "====== TESTCASE " << i << ": =======" << endl;
+            cout << endl << "====== TESTCASE " << argv[i] << ": =======" << endl;
             run(atoi(argv[i]));
         }
     }

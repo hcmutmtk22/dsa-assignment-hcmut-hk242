@@ -7,13 +7,20 @@ using namespace std;
 
 void dlistDemo1(){
     List<int> dlist;
-    for(int i = 0; i< 20 ; i++)
-        dlist.add(i, i*i);
+    for(int i = 0; i< 10 ; i++)
+        dlist.add(0, i);
     dlist.println();
+    cout << "Size: " << dlist.size() << endl;
+    cout << dlist.removeItem(7) << endl;
     
     for(List<int>::Iterator it=dlist.begin(); it != dlist.end(); it++ )
         cout << *it << " ";
     cout << endl;
+
+    dlist.clear();
+    dlist.println();
+    cout << dlist.empty() << endl;
+    cout << "Size: " << dlist.size() << endl;
 }
 void dlistDemo2(){
     DLinkedList<Point*> list1(&DLinkedList<Point*>::free, &Point::pointEQ);
@@ -99,7 +106,7 @@ void dlistDemo6(){
     list.println();
     
     //
-    int& item = list.get(5);
+    int& item = list.get(3);
     item = 999;
     cout << setw(25) << left << "After changing an item: ";
     list.println();
